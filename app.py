@@ -8,6 +8,8 @@ def create_app():
     return app
 
 app=create_app()
+from backend.create_initialdata import *
 from backend.routes import *
+seed_data()
 if __name__=="__main__":
     app.run(debug=True)
