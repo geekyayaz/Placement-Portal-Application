@@ -30,12 +30,7 @@ def seed_data():
         ("Apple",        "hr@apple.com",         "+14151237004",  "https://apple.com"),
         ("Netflix",      "hr@netflix.com",       "+14151238005",  "https://netflix.com"),
         ("Infosys",      "hr@infosys.com",       "+917001234001", "https://infosys.com"),
-        ("TCS",          "hr@tcs.com",           "+917001234002", "https://tcs.com"),
-        ("Wipro",        "hr@wipro.com",         "+917001234003", "https://wipro.com"),
-        ("SKG",          "hr@skg.com",           "+918617854715", "https://skg.com"),
         ("Anime Mentor", "hr@animementor.com",   "+918617521478", "https://animementor.com"),
-        ("Razorpay",     "hr@razorpay.com",      "+918001234004", "https://razorpay.com"),
-        ("Zerodha",      "hr@zerodha.com",       "+918001234005", "https://zerodha.com"),
     ]
 
     companies = []
@@ -51,6 +46,31 @@ def seed_data():
         )
         db.session.add(c)
         companies.append(c)
+
+    db.session.flush()
+
+    #pending Company
+    pending_companies_data = [
+        ("TCS",          "hr@tcs.com",           "+917001234002", "https://tcs.com"),
+        ("Wipro",        "hr@wipro.com",         "+917001234003", "https://wipro.com"),
+        ("SKG",          "hr@skg.com",           "+918617854715", "https://skg.com"),
+        ("Razorpay",     "hr@razorpay.com",      "+918001234004", "https://razorpay.com"),
+        ("Zerodha",      "hr@zerodha.com",       "+918001234005", "https://zerodha.com"),
+    ]
+
+    pcompanies = []
+    for name, email, phone, website in pending_companies_data:
+        p = Company(
+            company_name=name,
+            email=email,
+            password=generate_password_hash("company123"),
+            hr_contact=phone,
+            website=website,
+            approval_status="Pending",
+            is_active=True
+        )
+        db.session.add(p)
+        companies.append(p)
 
     db.session.flush()
 
@@ -108,7 +128,7 @@ def seed_data():
             eligibility=eligibility,
             location=location,
             deadline=datetime.utcnow() + timedelta(days=30),
-            status="Approved"
+            status="Pending"
         )
         db.session.add(d)
         drives.append(d)

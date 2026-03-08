@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Placement Portal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                    <!-- search -->
+                    <form class="d-flex ms-3" role="search" action="/admin/search" method="GET">
+                        <input class="form-control me-2" type="search" name="q" placeholder="Search"
+                            value="{{ search_query or '' }}">
+                        <select class="form-select me-2" name="type" style="width:auto;">
+                            <option value="all">All</option>
+                            <option value="student">Student</option>
+                            <option value="company">Company</option>
+                        </select>
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container mt-4">
+        {% if search_query %}
+        <div class="alert alert-info mt-3">
+            Showing results for "<strong>{{ search_query }}</strong>"
+            <a href="/dashboard/admin" class="ms-3">Clear Search</a>
+        </div>
+        {% endif %}
+
+        <!-- ── STATS CARDS ── -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>{{ company | length }}</h2>
+                        <p class="text-muted mb-0">Total Companies</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>{{ student | length }}</h2>
+                        <p class="text-muted mb-0">Total Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>{{ drives | length }}</h2>
+                        <p class="text-muted mb-0">Placement Drives</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>{{ application | length }}</h2>
+                        <p class="text-muted mb-0">Applications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── REGISTERED COMPANIES ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Registered Companies</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">HR Contact</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Status</th>
+                            <th scope="col"> </th>
+                            <th scope="col">Action</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in company %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{c.company_name}}</td>
+                            <td>{{c.hr_contact}}</td>
+                            <td>{{c.email}}</td>
+                            <td><span class="badge bg-success">{{c.approval_status}}</span></td>
+                            <td><a href="/dashboard/company/{{c.company_id}}" class="btn btn-primary">View</a></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#deleteCompanyModal{{c.company_id}}">
+                                                Delete
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#blacklistCompanyModal{{c.company_id}}">
+                                                Blacklist
+                                            </button>
+                                        </li>
+                                        <li><a class="dropdown-item"
+                                                href="/admin/company/edit/{{c.company_id }}">Edit</a></li>
+                                    </ul>
+                                </div>
+                                <!-- Delete Company Modal -->
+                                <div class="modal fade" id="deleteCompanyModal{{c.company_id}}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete {{c.company_name}}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete
+                                                <strong>{{c.company_name}}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/delete/{{ c.company_id }}"
+                                                    class="btn btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Blacklist Company Modal -->
+                                <div class="modal fade" id="blacklistCompanyModal{{ c.company_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Blacklist {{ c.company_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to blacklist <strong>{{ c.company_name
+                                                    }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/reject/{{ c.company_id }}"
+                                                    class="btn btn-danger">Blacklist</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+
+        <!-- ── REGISTERED STUDENTS ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Registered Students</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Student Name</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Resume</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in student %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{ s.full_name }}</td>
+                            <td>{{ s.branch }}</td>
+                            <td>{{ s.phone }}</td>
+                            <td>
+                                {% if s.resume %}
+                                <a href="{{ s.resume.file_path }}" target="_blank">View Resume</a>
+                                {% else %}
+                                <span class="text-muted">No Resume</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#deleteStudentModal{{ s.student_id }}">
+                                                Delete
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#blacklistStudentModal{{ s.student_id }}">
+                                                Blacklist
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="/admin/student/edit/{{ s.student_id }}">Edit</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Delete Modal — INSIDE loop -->
+                                <div class="modal fade" id="deleteStudentModal{{ s.student_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete {{ s.full_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete <strong>{{ s.full_name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/student/delete/{{ s.student_id }}"
+                                                    class="btn btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Blacklist Modal — INSIDE loop -->
+                                <div class="modal fade" id="blacklistStudentModal{{ s.student_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Blacklist {{ s.full_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to blacklist <strong>{{ s.full_name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/student/blacklist/{{ s.student_id }}"
+                                                    class="btn btn-danger">Blacklist</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- ── COMPANY APPLICATIONS (PENDING APPROVAL) ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Company Applications</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Website</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">View</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pending_companies %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{ p.company_name }}</td>
+                            <td>{{ p.website }}</td>
+                            <td>{{ p.email }}</td>
+                            <td><a href="/dashboard/company/{{p.company_id}}" class="btn btn-primary">View</a></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#approveCompanyModal{{ p.company_id }}">
+                                                Approve
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#rejectCompanyModal{{ p.company_id }}">
+                                                Reject
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Approve Modal — INSIDE loop -->
+                                <div class="modal fade" id="approveCompanyModal{{ p.company_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Approve {{ p.company_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to approve <strong>{{ p.company_name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/approve/{{ p.company_id }}"
+                                                    class="btn btn-success">Approve</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reject Modal — INSIDE loop -->
+                                <div class="modal fade" id="rejectCompanyModal{{ p.company_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Reject {{ p.company_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to reject <strong>{{ p.company_name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/reject/{{ p.company_id }}"
+                                                    class="btn btn-warning">Reject</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- ── ONGOING DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Ongoing Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in drives %}
+                        <tr>
+                            <th scope="row">{{d.drive_id}}</th>
+                            <td>{{d.job_title}}</td>
+                            <td>{{d.company.company_name}}</td>
+                            <td>{{d.company.email}}</td>
+                            <td>{{d.deadline}}</td>
+                            <td>{{d.status}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
+                                <a href="/admin/drive/complete/{{ d.drive_id }}" class="btn btn-success">Mark as
+                                    Complete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- ── STUDENT APPLICATIONS ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Student Applications</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Drive</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col">Company</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in application %}
+                        <tr>
+                            <th scope="row">{{a.application_id}}</th>
+                            <td>{{a.student.full_name}}</td>
+                            <td>{{a.drive.job_title}}</td>
+                            <td>{{a.student.branch}}</td>
+                            <td>{{a.drive.company.company_name}}</td>
+                            <td>{{a.applied_at}}</td>
+                            <td>{{a.status}}</td>
+                            <td>
+                                <a href="/dashboard/application/{{a.application_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ── COMPANY APPLICATIONS (Rejected APPROVAL) ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Rejected Companies</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Website</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rejected_companies %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{ r.company_name }}</td>
+                            <td>{{ r.website }}</td>
+                            <td>{{ r.email }}</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#approveCompanyModal{{ r.company_id }}">
+                                                Approve
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                data-bs-target="#deleteCompanyModal{{ r.company_id }}">
+                                                Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Approve Modal — INSIDE loop -->
+                                <div class="modal fade" id="approveCompanyModal{{ r.company_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Approve {{ r.company_name }}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to approve <strong>{{ r.company_name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/approve/{{ r.company_id }}"
+                                                    class="btn btn-success">Approve</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Delete Company Modal -->
+                                <div class="modal fade" id="deleteCompanyModal{{r.company_id}}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete {{r.company_name}}</h5>
+                                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete
+                                                <strong>{{r.company_name}}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/admin/company/delete/{{ r.company_id }}"
+                                                    class="btn btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ── Complete DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Completed Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for com in comple_drive %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{com.job_title}}</td>
+                            <td>{{com.company.company_name}}</td>
+                            <td>{{com.company.email}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{com.drive_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

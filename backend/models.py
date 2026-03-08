@@ -97,7 +97,8 @@ class Placement_Drive(db.Model):
     location = db.Column(db.String(100), nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pending")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)        # ✅ no brackets
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
 
     applications = db.relationship('Application', backref='drive', lazy=True)
 
@@ -115,14 +116,15 @@ class Application(db.Model):
                          nullable=False)
     resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'),
                           nullable=False)
-    applied_at = db.Column(db.DateTime, default=datetime.utcnow)        # ✅ no brackets
+    applied_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Applied")
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,        # ✅ no brackets
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,  
                            onupdate=datetime.utcnow)
 
     __table_args__ = (
         db.UniqueConstraint('student_id', 'drive_id', name='unique_application'),
     )
+    resume = db.relationship('Resume', backref='resume', lazy=True)
 
     def __repr__(self):
         return f"<Application student={self.student_id} drive={self.drive_id}>"
