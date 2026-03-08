@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Placement Portal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <h1 style="font-size: 1.5rem; margin: 10px;">Welcome {{company.company_name}}</h1>
+    <div class="container mt-4">
+        <!-- ── ONGOING DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Ongoing Drives</h3>
+                <a class="btn btn-primary" href="/company/new_drive">+ Create</a>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in on_drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{d.job_title}}</td>
+                            <td>{{d.deadline}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
+                                <a href="/drive/complete/{{ d.drive_id }}" class="btn btn-success">Mark as Complete</a>
+                                <a href="/company/view_applicants" class="btn btn-success">View Applicants</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ── Pending DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Pending Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pending_drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{p.job_title}}</td>
+                            <td>{{p.deadline}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{p.drive_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ── Rejected DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Rejected Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rejected_drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{r.job_title}}</td>
+                            <td>{{r.deadline}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{r.drive_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── Closed DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Closed Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in closed_drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{c.job_title}}</td>
+                            <td>{{c.deadline}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{c.drive_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

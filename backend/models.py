@@ -98,6 +98,8 @@ class Placement_Drive(db.Model):
     deadline = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    salary_range = db.Column(db.String(100))
+    required_skills = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
 
     applications = db.relationship('Application', backref='drive', lazy=True)

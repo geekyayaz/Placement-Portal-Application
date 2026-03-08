@@ -19,7 +19,7 @@
     <p>Location: {{drive.location}}</p>
     <p>Deadline: {{drive.deadline}}</p>
     <!-- only for admin -->
-        {% if current_user.__class__.__name__ == 'Admin' and is_active==1 %}
+        {% if current_user.__class__.__name__ == 'Admin'%}
     <a href="/admin/drive/approve/{{ drive.drive_id }}" class="btn btn-success">Approve</a>
     <a href="/admin/drive/reject/{{ drive.drive_id }}" class="btn btn-warning">Reject</a>
     {% endif %}

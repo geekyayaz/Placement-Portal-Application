@@ -9,21 +9,63 @@
 </head>
 <body>
     <div class="container-fluid d-flex justify-content-center align-items-center vh-100 text-center">
-    <div class="card mb-4">
-        <div class="card-header"><h2 class="card-title">Student Application</h2></div>
-  <div class="card-body">
-    <p>Student Name: {{application.student.full_name}}</p>
-    <p>Deperment: {{application.student.branch}}</p>
-    <p>Drive: {{application.drive_id}}</p>
-    <p>Job Title: {{application.drive.job_title}}</p>
-    <p>Location: {{application.drive.location}}</p>
-    <p>Current Status: {{application.status}}</p>
-    <!-- only for admin -->
-     <a href="{{application.resume.file_path}}" class="btn btn-primary">View Resume</a>
-    <a href="javascript:history.back()" class="btn btn-primary">Go Back</a>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title">Student Application</h2>
+            </div>
+            <div class="card-body">
+
+                <p><strong>Student Name:</strong> {{ application.student.full_name }}</p>
+                <p><strong>Department:</strong> {{ application.student.branch }}</p>
+                <p><strong>Job Title:</strong> {{ application.drive.job_title }}</p>
+                <p><strong>Location:</strong> {{ application.drive.location }}</p>
+                <p><strong>Company:</strong> {{ application.drive.company.company_name }}</p>
+                <p>
+                    <strong>Current Status:</strong>
+                    {% if application.status == 'Selected' %}
+                        <span class="badge bg-success">Selected</span>
+                    {% elif application.status == 'Shortlisted' %}
+                        <span class="badge bg-primary">Shortlisted</span>
+                    {% elif application.status == 'Rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% elif application.status == 'Waiting' %}
+                        <span class="badge bg-warning">Waiting</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Applied</span>
+                    {% endif %}
+                </p>
+
+                <!-- Company and Admin can change status -->
+                {% if current_user.__class__.__name__ in ['Company'] %}
+                <div class="mb-3">
+                    <strong>Change Status:</strong><br><br>
+                    <a href="/application/status/{{ application.application_id }}/Shortlisted"
+                       class="btn btn-primary btn-sm me-1">Shortlist</a>
+                    <a href="/application/status/{{ application.application_id }}/Waiting"
+                       class="btn btn-warning btn-sm me-1">Waiting</a>
+                    <a href="/application/status/{{ application.application_id }}/Selected"
+                       class="btn btn-success btn-sm me-1">Select</a>
+                    <a href="/application/status/{{ application.application_id }}/Rejected"
+                       class="btn btn-danger btn-sm me-1">Reject</a>
+                </div>
+                {% endif %}
+
+                <!-- Resume — visible to Admin and Company only -->
+                {% if current_user.__class__.__name__ in ['Company', 'Admin'] %}
+                    {% if application.student.resume %}
+                        <a href="{{ application.student.resume.file_path }}"
+                           class="btn btn-secondary btn-sm me-1" target="_blank">View Resume</a>
+                    {% else %}
+                        <span class="text-muted">No Resume Uploaded</span>
+                    {% endif %}
+                {% endif %}
+
+                <a href="javascript:history.back()" class="btn btn-primary btn-sm">Go Back</a>
+
+            </div>
+        </div>
     </div>
-  </div>
-  </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>

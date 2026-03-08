@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">Create a Drive</h2>
+        </div>
+        <div class="card-body">
+            <form action="/company/new_drive" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Job Title</label>
+                    <input type="text" class="form-control" name="job_title" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Job Description</label>
+                    <textarea class="form-control" name="job_description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Eligibility</label>
+                    <input type="text" class="form-control" name="eligibility" required
+                        placeholder="Example: B.Tech CSE">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Job Location</label>
+                    <input type="text" class="form-control" name="location" required>
+                </div>
+                <div class="mb-3">
+    <label class="form-label">Salary Range</label>
+    <input type="text" class="form-control" name="salary_range"
+           placeholder="Example: 4-6 LPA">
+</div>
+<div class="mb-3">
+    <label class="form-label">Required Skills</label>
+    <input type="text" class="form-control" name="required_skills"
+           placeholder="Example: Python, SQL, Django">
+</div>
+                <div class="mb-3">
+                    <label class="form-label">Deadline</label>
+                    <input type="date" class="form-control" name="deadline" required>
+                </div>
+                <div class="d-flex justify-content-between">
+
+                    <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Drive
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

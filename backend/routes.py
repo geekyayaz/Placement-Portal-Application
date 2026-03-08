@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 from backend.models import *
 from app import app
 from flask_login import login_user, login_required, current_user, logout_user
+from datetime import datetime
 
 
 @app.route('/')
@@ -54,23 +55,6 @@ def register():
         return render_template("register.html")
 
 
-#student_dashboard
-@app.route("/dashboard/student",  methods=['GET','POST'])
-@login_required
-def student_dashboard():
-    if isinstance(current_user,Student):
-        return f"Welcome to Student Dashboard {current_user.full_name}"
-    else:
-        return "You are not Authorized"
-
-# Company Dashboard
-@app.route("/dashboard/company")
-@login_required
-def company_dashboard():
-    if isinstance(current_user,Company):
-        return f"Welcome to Company Dashboard {current_user.company_name}"
-    else:
-        return "You are not Authorized"
 
 #Admin Dashboard
 @app.route("/dashboard/admin", methods=['GET','POST'])
@@ -84,7 +68,7 @@ def admin_dashboard():
         comple_drive=Placement_Drive.query.filter_by(is_active=False).all()
         application=db.session.query(Application).all()
         rejected_companies = Company.query.filter_by(approval_status="Rejected").all()
-        return render_template("/admin/admin_dashboard.html/",company=company, student=students, pending_companies=pending_companies, drives=drives, application=application, rejected_companies=rejected_companies, comple_drive=comple_drive)
+        return render_template("admin/admin_dashboard.html/",company=company, student=students, pending_companies=pending_companies, drives=drives, application=application, rejected_companies=rejected_companies, comple_drive=comple_drive)
      else:
         return "You are not Authorized"
 
@@ -265,23 +249,26 @@ def reject_drive(drive_id):
             db.session.commit()
         return redirect("/dashboard/admin")
 
-@app.route("/admin/drive/complete/<int:drive_id>")
+@app.route("/drive/complete/<int:drive_id>")
 @login_required
 def end_drive(drive_id):
-        if isinstance(current_user,Admin):
-            drive=Placement_Drive.query.get(drive_id)
-            drive.is_active= False
-            db.session.commit()
-        return redirect("/dashboard/admin")
 
-@app.route("/dashboard/application/<int:application_id>")
-@login_required
-def application_details(application_id):
-    if isinstance(current_user, (Admin, Student, Company)):
-        application=Application.query.get(application_id)
-        return render_template("student_application.html", application=application)
-    else:
-        return "You are not Authorized"
+    if isinstance(current_user, (Admin, Company)):
+
+        drive = Placement_Drive.query.get_or_404(drive_id)
+
+        drive.is_active = False
+        db.session.commit()
+
+        if isinstance(current_user, Admin):
+            return redirect("/dashboard/admin")
+
+        elif isinstance(current_user, Company):
+            return redirect("/dashboard/company")
+
+    return "You are not Authorized", 403
+
+
 
 @app.route("/dashboard/company/<int:company_id>")
 @login_required
@@ -291,3 +278,111 @@ def company_details(company_id):
         return render_template("view_company.html", company=company)
     else:
         return "Not Authorized"
+    
+
+@app.route("/dashboard/company")
+@login_required
+def company_dashboard():
+    if isinstance(current_user, Company):
+        on_drives = Placement_Drive.query.filter_by(
+            status="Approved", is_active=True,
+            company_id=current_user.company_id
+        ).all()
+        rejected_drives = Placement_Drive.query.filter_by(
+            status="Reject",
+            company_id=current_user.company_id
+        ).all()
+        pending_drives = Placement_Drive.query.filter_by(status="Pending",company_id=current_user.company_id).all()
+        closed_drives = Placement_Drive.query.filter_by(
+    is_active=False,
+    company_id=current_user.company_id
+).all()
+        return render_template("company/company_dashboard.html",rejected_drives=rejected_drives, on_drives=on_drives, company=current_user,pending_drives =pending_drives,closed_drives=closed_drives)
+    return "You are not Authorized", 403
+
+
+@app.route("/company/new_drive", methods=["GET", "POST"])
+@login_required
+def new_drive():
+    if isinstance(current_user, Company):
+
+        if request.method == "POST":
+            job_title       = request.form.get("job_title")
+            job_description = request.form.get("job_description")
+            eligibility     = request.form.get("eligibility")
+            location        = request.form.get("location")
+            salary_range    = request.form.get("salary_range")
+            required_skills = request.form.get("required_skills")
+            deadline        = datetime.strptime(request.form.get("deadline"), "%Y-%m-%d")
+
+            drive = Placement_Drive(
+                company_id=current_user.company_id,
+                job_title=job_title,
+                job_description=job_description,
+                eligibility=eligibility,
+                location=location, salary_range=salary_range, required_skills=required_skills,
+                deadline=deadline
+            )
+            db.session.add(drive)
+            db.session.commit()
+            return redirect("/dashboard/company")
+
+        return render_template("company/create_drive.html")
+
+    return "You are not Authorized", 403
+
+@app.route("/company/view_applicants")
+@login_required
+def view_applications():
+    if isinstance(current_user, Company):
+        # get all drives belonging to this company first
+        drives = Placement_Drive.query.filter_by(
+            company_id=current_user.company_id
+        ).all()
+
+        # collect drive IDs
+        drive_ids = [d.drive_id for d in drives]
+
+        # get all applications for those drives
+        applications = Application.query.filter(
+            Application.drive_id.in_(drive_ids)
+        ).all()
+
+        return render_template("company/view_applicants.html",
+                               applications=applications)
+    return "You are not Authorized", 403
+
+
+
+#student_dashboard
+@app.route("/dashboard/student",  methods=['GET','POST'])
+@login_required
+def student_dashboard():
+    if isinstance(current_user,Student):
+        return render_template("student/student_dashboard.html")
+    else:
+        return "You are not Authorized"
+
+
+
+
+
+#Application
+@app.route("/dashboard/application/<int:application_id>")
+@login_required
+def application_details(application_id):
+    if isinstance(current_user, (Admin, Student, Company)):
+        application = Application.query.get_or_404(application_id)
+        return render_template("student_application.html", application=application)
+    return "You are not Authorized", 403
+
+
+@app.route("/application/status/<int:application_id>/<status>")
+@login_required                                                   
+def update_application_status(application_id, status):
+    if isinstance(current_user, (Admin, Company)):
+        application = Application.query.get_or_404(application_id)
+        application.status = status
+        db.session.commit()
+        return redirect(f"/dashboard/application/{application_id}")
+    return "You are not Authorized", 403
