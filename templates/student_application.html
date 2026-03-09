@@ -36,7 +36,7 @@
                 </p>
 
                 <!-- Company and Admin can change status -->
-                {% if current_user.__class__.__name__ in ['Company'] %}
+               {% if current_user.__class__.__name__ == 'Company' and application.drive.is_active %}
                 <div class="mb-3">
                     <strong>Change Status:</strong><br><br>
                     <a href="/application/status/{{ application.application_id }}/Shortlisted"

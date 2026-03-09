@@ -1,12 +1,15 @@
 from flask import Flask
 from backend.models import db
 from flask_login import LoginManager
+import os
+
 
 
 def create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mydb.sqlite"
     app.config["SECRET_KEY"] = "mysecretkey"
+    app.config["UPLOAD_FOLDER"] = "static/resumes"
 
     db.init_app(app)
 

@@ -7,10 +7,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
-<body>
-    <div class="container-fluid d-flex justify-content-center align-items-center vh-100 text-center">
+<body class="bg-light">
+    <div class="container mt-5">
     <div class="card mb-4">
         <div class="card-header"><h2 class="card-title">Drive: {{drive.drive_id}}</h2></div>
+        {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
   <div class="card-body">
     <h3>Job Title: {{drive.job_title}}</h3>
     <p>Job Description: {{drive.job_description}}</p>
@@ -24,6 +31,19 @@
     <a href="/admin/drive/reject/{{ drive.drive_id }}" class="btn btn-warning">Reject</a>
     {% endif %}
 
+        <!-- only for company -->
+        {% if current_user.__class__.__name__ == 'Company'%}
+        <a href="#" class="btn btn-success">Edit</a>
+        {% endif %}
+    <!-- only for student -->
+{% if current_user.__class__.__name__ == 'Student' %}
+    {% set already_applied = current_user.applications | selectattr('drive_id', 'equalto', drive.drive_id) | list %}
+    {% if already_applied %}
+        <button class="btn btn-secondary" disabled>Already Applied</button>
+    {% else %}
+        <a href="/student/apply/{{ drive.drive_id }}" class="btn btn-success">Apply</a>
+    {% endif %}
+{% endif %}
     <a href="javascript:history.back()" class="btn btn-primary">Go Back</a>
     </div>
   </div>
