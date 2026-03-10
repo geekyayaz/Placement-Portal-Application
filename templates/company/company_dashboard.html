@@ -48,6 +48,7 @@
                             <th scope="col">Sr No</th>
                             <th scope="col">Drive Name</th>
                             <th scope="col">Deadline</th>
+                            <th scope="col">Applicants</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -57,10 +58,12 @@
                             <th scope="row">{{loop.index}}</th>
                             <td>{{d.job_title}}</td>
                             <td>{{d.deadline}}</td>
+                            <td><span class="badge bg-info text-dark">{{ d.applicant_count }}</span></td>
                             <td>
-                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
-                                <a href="/drive/complete/{{ d.drive_id }}" class="btn btn-success">Mark as Complete</a>
-                                <a href="/company/view_applicants/{{ d.drive_id }}" class="btn btn-success">View Applicants</a>
+                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary btn-sm">View</a>
+                                <a href="/company/edit_drive/{{d.drive_id}}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="/drive/complete/{{ d.drive_id }}" class="btn btn-success btn-sm">Mark Complete</a>
+                                <a href="/company/view_applicants/{{ d.drive_id }}" class="btn btn-secondary btn-sm">Applicants</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -141,6 +144,7 @@
                             <th scope="col">Sr No</th>
                             <th scope="col">Drive Name</th>
                             <th scope="col">Deadline</th>
+                            <th scope="col">Applicants</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -150,9 +154,10 @@
                             <th scope="row">{{loop.index}}</th>
                             <td>{{c.job_title}}</td>
                             <td>{{c.deadline}}</td>
+                            <td><span class="badge bg-secondary">{{ c.applicant_count }}</span></td>
                             <td>
-                                <a href="/dashboard/drive/{{c.drive_id}}" class="btn btn-primary">View</a>
-                                <a href="/company/view_applicants/{{ c.drive_id }}" class="btn btn-success">View Applicants</a>
+                                <a href="/dashboard/drive/{{c.drive_id}}" class="btn btn-primary btn-sm">View</a>
+                                <a href="/company/view_applicants/{{ c.drive_id }}" class="btn btn-secondary btn-sm">Applicants</a>
                             </td>
                         </tr>
                         {% endfor %}

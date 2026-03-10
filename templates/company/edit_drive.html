@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Drive</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Placement Portal</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard/company">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container mt-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title">Edit Drive — {{ drive.job_title }}</h2>
+                <small class="text-muted">Note: Editing will reset the drive to Pending status and require admin re-approval.</small>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="/company/edit_drive/{{ drive.drive_id }}" method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" class="form-control" name="job_title"
+                               value="{{ drive.job_title }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Job Description</label>
+                        <textarea class="form-control" name="job_description" rows="3" required>{{ drive.job_description }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Eligibility</label>
+                        <input type="text" class="form-control" name="eligibility"
+                               value="{{ drive.eligibility }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Job Location</label>
+                        <input type="text" class="form-control" name="location"
+                               value="{{ drive.location }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Salary Range</label>
+                        <input type="text" class="form-control" name="salary_range"
+                               value="{{ drive.salary_range }}" placeholder="Example: 4-6 LPA">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Required Skills</label>
+                        <input type="text" class="form-control" name="required_skills"
+                               value="{{ drive.required_skills }}" placeholder="Example: Python, SQL, Django">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" class="form-control" name="deadline"
+                               value="{{ drive.deadline.strftime('%Y-%m-%d') }}" required>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/dashboard/company" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+</html>

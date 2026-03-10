@@ -24,6 +24,8 @@
                     <strong>Current Status:</strong>
                     {% if application.status == 'Selected' %}
                         <span class="badge bg-success">Selected</span>
+                    {% elif application.status == 'Interview' %}
+                        <span class="badge bg-info">Interview</span>
                     {% elif application.status == 'Shortlisted' %}
                         <span class="badge bg-primary">Shortlisted</span>
                     {% elif application.status == 'Rejected' %}
@@ -35,12 +37,14 @@
                     {% endif %}
                 </p>
 
-                <!-- Company and Admin can change status -->
-               {% if current_user.__class__.__name__ == 'Company' and application.drive.is_active %}
+                <!-- Company can change status -->
+                {% if current_user.__class__.__name__ == 'Company' and application.drive.is_active %}
                 <div class="mb-3">
                     <strong>Change Status:</strong><br><br>
                     <a href="/application/status/{{ application.application_id }}/Shortlisted"
                        class="btn btn-primary btn-sm me-1">Shortlist</a>
+                    <a href="/application/status/{{ application.application_id }}/Interview"
+                       class="btn btn-info btn-sm me-1">Interview</a>
                     <a href="/application/status/{{ application.application_id }}/Waiting"
                        class="btn btn-warning btn-sm me-1">Waiting</a>
                     <a href="/application/status/{{ application.application_id }}/Selected"

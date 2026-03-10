@@ -25,6 +25,8 @@
     <p>Eligibility: {{drive.eligibility}}</p>
     <p>Location: {{drive.location}}</p>
     <p>Deadline: {{drive.deadline}}</p>
+    <p>Salary Range: {{ drive.salary_range or "Not specified" }}</p>
+<p>Required Skills: {{ drive.required_skills or "Not specified" }}</p>
     <!-- only for admin -->
         {% if current_user.__class__.__name__ == 'Admin'%}
     <a href="/admin/drive/approve/{{ drive.drive_id }}" class="btn btn-success">Approve</a>
@@ -33,7 +35,7 @@
 
         <!-- only for company -->
         {% if current_user.__class__.__name__ == 'Company'%}
-        <a href="#" class="btn btn-success">Edit</a>
+        <a href="/company/edit_drive/{{drive.drive_id}}" class="btn btn-success">Edit</a>
         {% endif %}
     <!-- only for student -->
 {% if current_user.__class__.__name__ == 'Student' %}

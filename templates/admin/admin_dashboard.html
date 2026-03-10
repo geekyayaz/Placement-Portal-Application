@@ -603,6 +603,34 @@
                 </table>
             </div>
         </div>
+        <!-- Backlisted Students -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Backlisted Students</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Student Name</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col">Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in blacklist_student %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{ s.full_name }}</td>
+                            <td>{{ s.branch }}</td>
+                            <td>{{ s.phone }}</td>
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
