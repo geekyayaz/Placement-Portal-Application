@@ -68,12 +68,13 @@ def admin_dashboard():
         company=Company.query.filter_by(approval_status="Approved").all()
         students=Student.query.filter_by(is_active=True).all()
         pending_companies = Company.query.filter_by(approval_status="Pending").all()
-        drives=Placement_Drive.query.filter_by(is_active=True).all()
+        drives=Placement_Drive.query.filter_by(is_active=True, status="Approved").all()
+        pending_drives=Placement_Drive.query.filter_by(is_active=True, status="Pending").all()
         comple_drive=Placement_Drive.query.filter_by(is_active=False).all()
         application=db.session.query(Application).all()
         rejected_companies = Company.query.filter_by(approval_status="Rejected").all()
         blacklist_student=Student.query.filter_by(is_active=False).all()
-        return render_template("admin/admin_dashboard.html",company=company, student=students, pending_companies=pending_companies, drives=drives, application=application, rejected_companies=rejected_companies, comple_drive=comple_drive,blacklist_student=blacklist_student)
+        return render_template("admin/admin_dashboard.html",company=company, pending_drives=pending_drives,student=students, pending_companies=pending_companies, drives=drives, application=application, rejected_companies=rejected_companies, comple_drive=comple_drive,blacklist_student=blacklist_student)
      else:
         return "You are not Authorized"
 
@@ -98,7 +99,7 @@ def edit_company(company_id):
             company.approval_status = request.form.get("approval_status")
 
             db.session.commit()
-            return redirect("/dashboard/admin")
+            return redirect("/dashboard/admin#company")
     else:
         return "You are not Authorized", 403
 
@@ -121,7 +122,7 @@ def edit_student(student_id):
             student.grad_year  = request.form.get("grad_year")
 
             db.session.commit()
-            return redirect("/dashboard/admin")
+            return redirect("/dashboard/admin#student")
     else:
         return "You are not Authorized", 403
 
@@ -143,7 +144,7 @@ def delete_company(company_id):
 
         db.session.delete(company)
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#company")
     return "Not Authorized", 403
 
 @app.route("/admin/student/delete/<int:student_id>")
@@ -157,7 +158,7 @@ def delete_student(student_id):
 
         db.session.delete(student)
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#student")
     return "Not Authorized", 403
 
 # Admin Dashboard- Approve/Reject
@@ -168,7 +169,7 @@ def blacklist_company(company_id):
         company = Company.query.get_or_404(company_id)
         company.is_active = False
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#Rejected_Companies")
     return "Not Authorized", 403
 
 
@@ -179,8 +180,20 @@ def blacklist_student(student_id):
         student = Student.query.get_or_404(student_id)
         student.is_active = False
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#bstudent")
     return "Not Authorized", 403
+
+
+@app.route("/admin/student/approve/<int:student_id>")
+@login_required
+def approve_student(student_id):
+    if isinstance(current_user, Admin):
+        student = Student.query.get_or_404(student_id)
+        student.is_active = True
+        db.session.commit()
+        return redirect("/dashboard/admin#student")
+    return "Not Authorized", 403
+
 
 @app.route("/admin/company/approve/<int:company_id>")
 @login_required
@@ -189,8 +202,9 @@ def approve_company(company_id):
         company = Company.query.get_or_404(company_id)
         company.approval_status = "Approved"
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#company")
     return "Not Authorized", 403
+
 @app.route("/admin/company/reject/<int:company_id>")
 @login_required
 def reject_company(company_id):
@@ -198,7 +212,7 @@ def reject_company(company_id):
         company = Company.query.get_or_404(company_id)
         company.approval_status = "Rejected"
         db.session.commit()
-        return redirect("/dashboard/admin")
+        return redirect("/dashboard/admin#Rejected_Companies")
     return "Not Authorized", 403
 
 ## Admin Dashboard- Search
@@ -244,7 +258,8 @@ def admin_search():
 def drive_details(drive_id):
      if isinstance(current_user, (Admin, Student, Company)):
         drive = Placement_Drive.query.get(drive_id)
-        return render_template("drives_details.html",drive=drive)
+        applications=Placement_Drive.query.get(drive_id)
+        return render_template("drives_details.html",drive=drive, applications=applications)
      else:
         return "You are not Authorized"
 
@@ -255,16 +270,17 @@ def approve_drive(drive_id):
         drive=Placement_Drive.query.get(drive_id)
         drive.status= "Approved"
         db.session.commit()
-    return redirect("/dashboard/admin")
+    return redirect("/dashboard/admin#drives")
 
 @app.route("/admin/drive/reject/<int:drive_id>")
 @login_required
 def reject_drive(drive_id):
-        if isinstance(current_user,Admin):
-            drive=Placement_Drive.query.get(drive_id)
-            drive.status= "Rejected"
-            db.session.commit()
-        return redirect("/dashboard/admin")
+    if isinstance(current_user, Admin):
+        drive = Placement_Drive.query.get(drive_id)
+        drive.status = "Rejected"
+        db.session.commit()
+        return redirect(f"/dashboard/admin#drives")
+    return "Not Authorized", 403
 
 @app.route("/drive/complete/<int:drive_id>")
 @login_required
@@ -278,7 +294,7 @@ def end_drive(drive_id):
         db.session.commit()
 
         if isinstance(current_user, Admin):
-            return redirect("/dashboard/admin")
+            return redirect("/dashboard/admin#cdrives")
 
         elif isinstance(current_user, Company):
             return redirect("/dashboard/company")
@@ -293,9 +309,10 @@ def company_details(company_id):
     if isinstance(current_user,(Admin,Company)):
         company=db.session.get(Company,company_id)
         drives=Placement_Drive.query.filter_by(status="Approved", company_id=company.company_id).all()
-        pending_drives=Placement_Drive.query.filter_by(status="Pending", company_id=company.company_id).all()
+        pending_drives=Placement_Drive.query.filter_by(status="Pending", is_active=True, company_id=company.company_id).all()
         old_drives=Placement_Drive.query.filter_by(company_id=company.company_id, is_active=False).all()
-        return render_template("view_company.html", company=company, drives=drives, pending_drives=pending_drives, old_drives=old_drives)
+        r_drives=Placement_Drive.query.filter_by(company_id=company.company_id, status="Rejected" ).all()
+        return render_template("view_company.html", company=company, drives=drives, r_drives=r_drives,pending_drives=pending_drives, old_drives=old_drives)
     else:
         return "Not Authorized"
     
@@ -318,7 +335,7 @@ def company_dashboard():
         ).all()
 
         pending_drives = Placement_Drive.query.filter_by(
-            status="Pending",
+            status="Pending", is_active=True,
             company_id=current_user.company_id
         ).all()
 
@@ -338,6 +355,16 @@ def company_dashboard():
                                closed_drives=closed_drives)
     return "You are not Authorized", 403
 
+
+
+@app.route("/dashboard/student/<int:student_id>")
+@login_required
+def student_page(student_id):
+    if isinstance(current_user,Admin):
+        student=Student.query.get(student_id)
+        return render_template("admin/view_student.html", student=student)
+    else:
+        return "You are not authorized",403
 
 @app.route("/company/new_drive", methods=["GET", "POST"])
 @login_required
@@ -374,7 +401,7 @@ def edit_drive(drive_id):
     if isinstance(current_user, Company):
         drive = Placement_Drive.query.get_or_404(drive_id)
 
-        # Only the owning company can edit
+
         if drive.company_id != current_user.company_id:
             return "Not Authorized", 403
 
@@ -399,7 +426,7 @@ def edit_drive(drive_id):
 @app.route("/company/view_applicants/<int:drive_id>")
 @login_required
 def view_applications(drive_id):
-    if isinstance(current_user, Company):
+    if isinstance(current_user, (Admin,Company)):
         applications = Application.query.filter_by(drive_id=drive_id).all()
         return render_template("company/view_applicants.html",
                                applications=applications)
@@ -485,7 +512,6 @@ def edit_profile():
             current_user.cgpa       = request.form.get("cgpa")
             current_user.grad_year  = request.form.get("grad_year")
 
-            # Only update password if user typed a new one
             new_pwd = request.form.get("password")
             if new_pwd:
                 current_user.password = generate_password_hash(new_pwd)
@@ -536,9 +562,9 @@ def register_student():
                 phone=phone, branch=branch,
                 institute=institute, cgpa=cgpa, grad_year=grad_year)
     db.session.add(s)
-    db.session.flush()  # ← gives s.student_id without full commit
+    db.session.flush() 
 
-    # resume upload after student created
+
     file = request.files.get("resume")
     if file and file.filename != "" and file.filename.endswith(".pdf"):
         filename = secure_filename(f"student_{s.student_id}_resume.pdf")
@@ -558,7 +584,7 @@ def register_company():
     name=request.form.get("company_name")
     email=request.form.get("email")
     pwd=request.form.get("password")
-    confrim=request.form.get("confrim_password")
+    confrim=request.form.get("confirm_password")
     hr_contact=request.form.get("hr_contact")
     website=request.form.get("website")
 
@@ -602,7 +628,7 @@ def student_search():
             student_id=current_user.student_id
         ).all()
 
-        # add active drive count per company
+
         for c in companies:
             c.active_drive_count = Placement_Drive.query.filter_by(
                 company_id=c.company_id,
@@ -661,7 +687,7 @@ def apply_drive(drive_id):
             flash("You have already applied for this drive.")
             return redirect(f"/dashboard/drive/{drive_id}")
 
-        # check if student has a resume
+
         if not current_user.resume:
             flash("Please upload a resume before applying.")
             return redirect("/dashboard/student/edit")

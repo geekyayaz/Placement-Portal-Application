@@ -31,6 +31,11 @@ def seed_data():
         ("Netflix",      "hr@netflix.com",       "+14151238005",  "https://netflix.com"),
         ("Infosys",      "hr@infosys.com",       "+917001234001", "https://infosys.com"),
         ("Anime Mentor", "hr@animementor.com",   "+918617521478", "https://animementor.com"),
+        ("TCS",          "hr@tcs.com",           "+917001234002", "https://tcs.com"),
+        ("Wipro",        "hr@wipro.com",         "+917001234003", "https://wipro.com"),
+        ("SKG",          "hr@skg.com",           "+918617854715", "https://skg.com"),
+        ("Razorpay",     "hr@razorpay.com",      "+918001234004", "https://razorpay.com"),
+        ("Zerodha",      "hr@zerodha.com",       "+918001234005", "https://zerodha.com"),
     ]
 
     companies = []
@@ -51,11 +56,7 @@ def seed_data():
 
     #pending Company
     pending_companies_data = [
-        ("TCS",          "hr@tcs.com",           "+917001234002", "https://tcs.com"),
-        ("Wipro",        "hr@wipro.com",         "+917001234003", "https://wipro.com"),
-        ("SKG",          "hr@skg.com",           "+918617854715", "https://skg.com"),
-        ("Razorpay",     "hr@razorpay.com",      "+918001234004", "https://razorpay.com"),
-        ("Zerodha",      "hr@zerodha.com",       "+918001234005", "https://zerodha.com"),
+        ("Zero",      "hr@zeroa.com",       "+78125641", "https://zero.com")
     ]
 
     pcompanies = []
@@ -128,12 +129,30 @@ def seed_data():
             eligibility=eligibility,
             location=location,
             deadline=datetime.utcnow() + timedelta(days=30),
-            status="Pending"
+            status="Approved"
         )
         db.session.add(d)
         drives.append(d)
 
     db.session.flush()
+
+
+    # ── 2 PENDING DRIVES ──
+    pending_drives_data = [
+        (companies[0], "Data Engineer",      "Apache Spark, Kafka, Hadoop",     "CGPA 7.5+, CS/IT branch", "Bangalore"),
+        (companies[3], "UI/UX Designer",     "Figma, Adobe XD, user research",  "Any branch, portfolio required", "Remote"),]
+
+    for company, title, desc, eligibility, location in pending_drives_data:
+        d = Placement_Drive(
+            company_id=company.company_id,
+            job_title=title,
+            job_description=desc,
+            eligibility=eligibility,
+            location=location,
+            deadline=datetime.utcnow() + timedelta(days=30),
+            status="Pending")
+        db.session.add(d)
+    db.session.flush() 
 
     # ────────────────────── RESUMES ──────────────────────
     for student in students:
@@ -173,12 +192,12 @@ def seed_data():
         )
         db.session.add(a)
 
-    db.session.flush()                                        # flush before querying Selected
+    db.session.flush() 
 
     # ────────────────────── PLACEMENTS ──────────────────────
     selected_apps = Application.query.filter_by(status="Selected").all()
 
-    for selected in selected_apps:                            # renamed 'app' to 'selected' to avoid clash with Flask app
+    for selected in selected_apps: 
         drive = Placement_Drive.query.get(selected.drive_id)
         p = Placement(
             student_id=selected.student_id,
@@ -187,7 +206,8 @@ def seed_data():
             application_id=selected.application_id,
             package=12.5
         )
-        db.session.add(p)                                     # inside the loop now
+        db.session.add(p)
+    
 
     db.session.commit()
     print("Database seeded successfully!")

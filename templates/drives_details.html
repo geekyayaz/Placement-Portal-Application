@@ -28,11 +28,25 @@
     <p>Salary Range: {{ drive.salary_range or "Not specified" }}</p>
 <p>Required Skills: {{ drive.required_skills or "Not specified" }}</p>
     <!-- only for admin -->
-        {% if current_user.__class__.__name__ == 'Admin'%}
-    <a href="/admin/drive/approve/{{ drive.drive_id }}" class="btn btn-success">Approve</a>
-    <a href="/admin/drive/reject/{{ drive.drive_id }}" class="btn btn-warning">Reject</a>
+     {% if current_user.__class__.__name__ == 'Admin' %}
+
+    {% if drive.status == "Pending" and  drive.is_active==True %}
+        <a href="/admin/drive/approve/{{ drive.drive_id }}" class="btn btn-success">Approve</a>
+        <a href="/admin/drive/reject/{{ drive.drive_id }}" class="btn btn-warning">Reject</a>
+
+    {% elif drive.status == "Approved" and drive.is_active==True %}
+        <a href="/admin/drive/reject/{{ drive.drive_id }}" class="btn btn-warning">Reject</a>
+        <a href="/company/view_applicants/{{ drive.drive_id }}" class="btn btn-primary">View Applicants</a>
+
+    {% elif drive.status == "Rejected" %}
+        <a href="/admin/drive/approve/{{ drive.drive_id }}" class="btn btn-success">Approve</a>
     {% endif %}
 
+    {% if not drive.is_active %}
+        <a href="/company/view_applicants/{{ drive.drive_id }}" class="btn btn-primary">View Applicants</a>
+    {% endif %}
+
+{% endif %}
         <!-- only for company -->
         {% if current_user.__class__.__name__ == 'Company'%}
         <a href="/company/edit_drive/{{drive.drive_id}}" class="btn btn-success">Edit</a>

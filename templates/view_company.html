@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>View Company</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
@@ -25,8 +25,6 @@
                     <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/">Home |</a>
-                                                <li class="nav-item">                            <a class="nav-link active" aria-current="page" href="/history">History |</a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/logout">Logout</a>
                         </li>
@@ -157,10 +155,43 @@
                 </table>
             </div>
         </div>
-
+                       <!-- ── Rejected DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Rejected Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in r_drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{d.job_title}}</td>
+                            <td>{{d.company.company_name}}</td>
+                            <td>{{d.company.email}}</td>
+                            <td>{{d.status}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <div class="text-center">
-    <a href="/dashboard/company" class="btn btn-info">Back to Dashboard</a>
+    <a href="javascript:history.back()" class="btn btn-info">Back to Dashboard</a>
     <a href="/admin/company/edit/{{ company.company_id }}" class="btn btn-info">Edit</a>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

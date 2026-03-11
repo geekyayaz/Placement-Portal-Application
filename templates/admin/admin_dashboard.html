@@ -93,7 +93,7 @@
         <!-- ── REGISTERED COMPANIES ── -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Registered Companies</h3>
+                <h3 id="company">Registered Companies</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -106,7 +106,7 @@
                             <th scope="col">Status</th>
                             <th scope="col"> </th>
                             <th scope="col">Action</th>
-                            
+
                         </tr>
                     </thead>
                     <tbody>
@@ -197,7 +197,7 @@
         <!-- ── REGISTERED STUDENTS ── -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Registered Students</h3>
+                <h3 id="student">Registered Students</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -208,6 +208,7 @@
                             <th scope="col">Branch</th>
                             <th scope="col">Phone Number</th>
                             <th scope="col">Resume</th>
+                            <th scope="col"></th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -225,6 +226,7 @@
                                 <span class="text-muted">No Resume</span>
                                 {% endif %}
                             </td>
+                            <td><a href="/dashboard/student/{{s.student_id}}" class="btn btn-primary">View</a></td>
                             <td>
                                 <div class="dropdown">
                                     <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
@@ -301,6 +303,43 @@
             </div>
         </div>
 
+        <!-- ── ONGOING DRIVES ── -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 id="drives">Ongoing Drives</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr No</th>
+                            <th scope="col">Drive Name</th>
+                            <th scope="col">Company Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in drives %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{d.job_title}}</td>
+                            <td>{{d.company.company_name}}</td>
+                            <td>{{d.company.email}}</td>
+                            <td>{{d.deadline.strftime("%d %b %Y") }}</td>
+                            <td>{{d.status}}</td>
+                            <td>
+                                <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
+                                <a href="/drive/complete/{{ d.drive_id }}" class="btn btn-success">Mark as Complete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <!-- ── COMPANY APPLICATIONS (PENDING APPROVAL) ── -->
         <div class="card mb-4">
@@ -400,10 +439,12 @@
         </div>
 
 
-        <!-- ── ONGOING DRIVES ── -->
+
+
+        <!-- ── Pending DRIVES ── -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Ongoing Drives</h3>
+                <h3>Pending Drives</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -419,17 +460,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for d in drives %}
+                        {% for d in pending_drives %}
                         <tr>
-                            <th scope="row">{{d.drive_id}}</th>
+                            <th scope="row">{{loop.index}}</th>
                             <td>{{d.job_title}}</td>
                             <td>{{d.company.company_name}}</td>
                             <td>{{d.company.email}}</td>
-                            <td>{{d.deadline}}</td>
+                            <td>{{d.deadline.strftime("%d %b %Y") }}</td>
                             <td>{{d.status}}</td>
                             <td>
                                 <a href="/dashboard/drive/{{d.drive_id}}" class="btn btn-primary">View</a>
-                                <a href="/drive/complete/{{ d.drive_id }}" class="btn btn-success">Mark as Complete</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -437,8 +477,6 @@
                 </table>
             </div>
         </div>
-
-
         <!-- ── STUDENT APPLICATIONS ── -->
         <div class="card mb-4">
             <div class="card-header">
@@ -455,6 +493,7 @@
                             <th scope="col">Company</th>
                             <th scope="col">Date</th>
                             <th scope="col">Status</th>
+
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -466,7 +505,7 @@
                             <td>{{a.drive.job_title}}</td>
                             <td>{{a.student.branch}}</td>
                             <td>{{a.drive.company.company_name}}</td>
-                            <td>{{a.applied_at}}</td>
+                            <td>{{a.applied_at.strftime("%d %b %Y")}}</td>
                             <td>{{a.status}}</td>
                             <td>
                                 <a href="/dashboard/application/{{a.application_id}}" class="btn btn-primary">View</a>
@@ -477,10 +516,10 @@
                 </table>
             </div>
         </div>
-        <!-- ── COMPANY APPLICATIONS (Rejected APPROVAL) ── -->
+        <!-- ── Rejected Companies ── -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Rejected Companies</h3>
+                <h3 id="Rejected_Companies">Rejected Companies</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -574,7 +613,7 @@
         <!-- ── Complete DRIVES ── -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Completed Drives</h3>
+                <h3 id="cdrives">Completed Drives</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -606,7 +645,7 @@
         <!-- Backlisted Students -->
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Backlisted Students</h3>
+                <h3 id="bstudent">Backlisted Students</h3>
             </div>
             <div class="card-body">
                 <table class="table">
@@ -616,6 +655,8 @@
                             <th scope="col">Student Name</th>
                             <th scope="col">Branch</th>
                             <th scope="col">Phone Number</th>
+                            <th></th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -625,6 +666,9 @@
                             <td>{{ s.full_name }}</td>
                             <td>{{ s.branch }}</td>
                             <td>{{ s.phone }}</td>
+                            <td><a href="/dashboard/student/{{s.student_id}}" class="btn btn-primary">View</a></td>
+                            <td><a href="/admin/student/approve/{{s.student_id}}" class="btn btn-primary">UnBacklist</a>
+                            </td>
                             {% endfor %}
                     </tbody>
                 </table>

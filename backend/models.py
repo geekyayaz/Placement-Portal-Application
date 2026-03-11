@@ -79,7 +79,7 @@ class Resume(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'),
                            nullable=False, unique=True)
     file_path = db.Column(db.String(300), nullable=False)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)       # ✅ no brackets
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"<Resume student_id={self.student_id}>"
@@ -141,7 +141,7 @@ class Placement(db.Model):
     company_id = db.Column(db.Integer, db.ForeignKey('company.company_id'), nullable=False)
     application_id = db.Column(db.Integer, db.ForeignKey('application.application_id'),
                                nullable=False)
-    placed_at = db.Column(db.DateTime, default=datetime.utcnow)         # ✅ no brackets
+    placed_at = db.Column(db.DateTime, default=datetime.utcnow)
     package = db.Column(db.Float)
 
     def __repr__(self):
